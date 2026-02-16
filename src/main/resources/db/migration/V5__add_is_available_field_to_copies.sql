@@ -1,0 +1,1 @@
+ALTER TABLE copies ADD COLUMN IF NOT EXISTS is_available bool NOT NULL DEFAULT true;

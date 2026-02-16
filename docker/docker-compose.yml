@@ -1,0 +1,11 @@
+services:
+  library-db:
+    image: "postgres:17.4"
+    container_name: "library-db"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=flavius
+      - POSTGRES_PASSWORD=secret
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
