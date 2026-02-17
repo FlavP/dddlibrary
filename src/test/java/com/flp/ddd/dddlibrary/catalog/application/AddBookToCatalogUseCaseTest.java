@@ -1,10 +1,10 @@
 package com.flp.ddd.dddlibrary.catalog.application;
 
 import com.flp.ddd.dddlibrary.catalog.domain.book.Isbn;
+import com.flp.ddd.dddlibrary.catalog.domain.events.CopyCreatedEvent;
 import com.flp.ddd.dddlibrary.catalog.domain.exceptions.BookNotFoundException;
 import com.flp.ddd.dddlibrary.catalog.infrastructure.persistence.TestBookRepository;
 import com.flp.ddd.dddlibrary.catalog.infrastructure.persistence.book.BookEntity;
-import com.flp.ddd.dddlibrary.catalog.infrastructure.persistence.copy.CopyEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +17,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.utility.DockerImageName;
 
@@ -30,6 +32,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @ExtendWith(MockitoExtension.class)
 @Transactional
+@RecordApplicationEvents
 public class AddBookToCatalogUseCaseTest {
 
     static org.testcontainers.containers.PostgreSQLContainer<?> postgres;
@@ -54,6 +57,8 @@ public class AddBookToCatalogUseCaseTest {
     TestBookRepository testBookRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    ApplicationEvents applicationEvents;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -69,7 +74,7 @@ public class AddBookToCatalogUseCaseTest {
     }
 
     @Test
-    void shouldCreateNewBookAndNewCopyInTheDatabaseAndAddCopyToCache() {
+    void shouldCreateNewBookAndNewCopyInTheDatabaseAndPublishCopyCreatedEvent() {
         Isbn isbn = new Isbn("9780132350884");
         BookInformation bookInformation = new BookInformation("Clean Code");
         when(bookSearchService.search(isbn)).thenReturn(bookInformation);
@@ -84,12 +89,13 @@ public class AddBookToCatalogUseCaseTest {
 
         BookEntity bookEntity = testBookRepository.findByIsbn(isbn)
                 .orElseThrow(() -> new AssertionError("Book not found"));
+        long eventCount = applicationEvents.stream(CopyCreatedEvent.class).count();
 
         assertThat(bookEntity.getTitle()).isEqualTo("Clean Code");
         assertThat(bookEntity.getCopies()).hasSize(1);
-        CopyEntity copy = bookEntity.getCopies().getFirst();
-        assertThat(copy.getBook().getBookId())
+        assertThat(bookEntity.getCopies().getFirst().getBook().getBookId())
                 .isEqualTo(bookEntity.getBookId());
+        assertThat(eventCount).isEqualTo(1);
     }
 
     @Test
