@@ -25,9 +25,12 @@ public class RentBookUseCase {
                 .expectedReturnedDate(LocalDate.now().plusWeeks(1))
                 .build();
         CopyDTO copyDTO = cache.getIfPresent(request.copyId().id());
-        if (copyDTO != null && copyDTO.available()) {
-            loanRepository.save(loan);
+
+        if (copyDTO == null || !copyDTO.available()) {
+            throw new CopyIsRentedException("The copy is already rented");
         }
-        throw new CopyIsRentedException("The copy is already rented");
+
+        loanRepository.save(loan);
+        cache.put(request.copyId().id(), new CopyDTO(new CopyId(request.copyId().id()), false));
     }
 }

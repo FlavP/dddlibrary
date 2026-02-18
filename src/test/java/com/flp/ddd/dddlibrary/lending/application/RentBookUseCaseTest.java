@@ -1,11 +1,13 @@
 package com.flp.ddd.dddlibrary.lending.application;
 
+import com.flp.ddd.dddlibrary.lending.domain.CopyDTO;
 import com.flp.ddd.dddlibrary.lending.domain.CopyId;
 import com.flp.ddd.dddlibrary.lending.domain.LoanCopyRequest;
 import com.flp.ddd.dddlibrary.lending.domain.UserId;
 import com.flp.ddd.dddlibrary.lending.domain.exceptions.CopyIsRentedException;
 import com.flp.ddd.dddlibrary.lending.infrastructure.persistence.TestLoanRepository;
 import com.flp.ddd.dddlibrary.lending.infrastructure.persistence.loan.LoanEntity;
+import com.github.benmanes.caffeine.cache.Cache;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,6 +21,8 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.utility.DockerImageName;
+
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -48,6 +52,8 @@ public class RentBookUseCaseTest {
     private TestLoanRepository loanRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private Cache<UUID, CopyDTO> copyDTOCache;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -82,10 +88,10 @@ public class RentBookUseCaseTest {
         UserId user1Id = new UserId();
         UserId user2Id = new UserId();
         CopyId copyId = new CopyId();
+        copyDTOCache.put(copyId.id(), new CopyDTO(copyId, true));
         LoanCopyRequest request1 = new LoanCopyRequest(user1Id, copyId);
         LoanCopyRequest request2= new LoanCopyRequest(user2Id, copyId);
         rentBookUseCase.execute(request1);
         assertThrows(CopyIsRentedException.class, () -> rentBookUseCase.execute(request2));
-
     }
 }
