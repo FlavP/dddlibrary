@@ -63,7 +63,7 @@ public class RentBookUseCaseTest {
     }
 
     @Test
-    void shouldRentAnExistingAvailableBook() {
+    void shouldRentAnExistingAvailableCopy() {
         UserId userId = new UserId();
         CopyId copyId = new CopyId();
         LoanCopyRequest request = new LoanCopyRequest(userId, copyId);
@@ -85,7 +85,7 @@ public class RentBookUseCaseTest {
         LoanCopyRequest request1 = new LoanCopyRequest(user1Id, copyId);
         LoanCopyRequest request2= new LoanCopyRequest(user2Id, copyId);
         rentBookUseCase.execute(request1);
-
         assertThrows(CopyIsRentedException.class, () -> rentBookUseCase.execute(request2));
+
     }
 }

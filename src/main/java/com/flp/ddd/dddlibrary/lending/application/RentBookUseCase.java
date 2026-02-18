@@ -1,19 +1,20 @@
 package com.flp.ddd.dddlibrary.lending.application;
 
 import com.flp.ddd.dddlibrary.UseCase;
-import com.flp.ddd.dddlibrary.lending.domain.Loan;
-import com.flp.ddd.dddlibrary.lending.domain.LoanCopyRequest;
-import com.flp.ddd.dddlibrary.lending.domain.LoanId;
-import com.flp.ddd.dddlibrary.lending.domain.LoanRepository;
+import com.flp.ddd.dddlibrary.lending.domain.*;
+import com.flp.ddd.dddlibrary.lending.domain.exceptions.CopyIsRentedException;
+import com.github.benmanes.caffeine.cache.Cache;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @UseCase
 @RequiredArgsConstructor
 public class RentBookUseCase {
     private final LoanRepository loanRepository;
+    private final Cache<UUID, CopyDTO> cache;
 
     public void execute(LoanCopyRequest request) {
         Loan loan = Loan.builder()
@@ -23,7 +24,10 @@ public class RentBookUseCase {
                 .createdAt(LocalDateTime.now())
                 .expectedReturnedDate(LocalDate.now().plusWeeks(1))
                 .build();
-
-        loanRepository.save(loan);
+        CopyDTO copyDTO = cache.getIfPresent(request.copyId().id());
+        if (copyDTO != null && copyDTO.available()) {
+            loanRepository.save(loan);
+        }
+        throw new CopyIsRentedException("The copy is already rented");
     }
 }

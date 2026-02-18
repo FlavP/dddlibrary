@@ -1,7 +1,7 @@
 package com.flp.ddd.dddlibrary.catalog.application;
 
 import com.flp.ddd.dddlibrary.catalog.domain.book.Isbn;
-import com.flp.ddd.dddlibrary.catalog.domain.events.CopyCreatedEvent;
+import com.flp.ddd.dddlibrary.shared.events.CopyCreatedEvent;
 import com.flp.ddd.dddlibrary.catalog.domain.exceptions.BookNotFoundException;
 import com.flp.ddd.dddlibrary.catalog.infrastructure.persistence.TestBookRepository;
 import com.flp.ddd.dddlibrary.catalog.infrastructure.persistence.book.BookEntity;
@@ -58,7 +58,7 @@ public class AddBookToCatalogUseCaseTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
     @Autowired
-    ApplicationEvents applicationEvents;
+    private ApplicationEvents applicationEvents;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -90,12 +90,17 @@ public class AddBookToCatalogUseCaseTest {
         BookEntity bookEntity = testBookRepository.findByIsbn(isbn)
                 .orElseThrow(() -> new AssertionError("Book not found"));
         long eventCount = applicationEvents.stream(CopyCreatedEvent.class).count();
+        CopyCreatedEvent copyCreatedEvent = applicationEvents.stream(CopyCreatedEvent.class)
+                        .findFirst()
+                                .orElseThrow();
 
         assertThat(bookEntity.getTitle()).isEqualTo("Clean Code");
         assertThat(bookEntity.getCopies()).hasSize(1);
         assertThat(bookEntity.getCopies().getFirst().getBook().getBookId())
                 .isEqualTo(bookEntity.getBookId());
         assertThat(eventCount).isEqualTo(1);
+        assertThat(copyCreatedEvent.copyId().toString())
+                .isEqualTo(bookEntity.getCopies().getFirst().getCopyId().toString());
     }
 
     @Test
@@ -109,14 +114,4 @@ public class AddBookToCatalogUseCaseTest {
 
         assertThat(record).isEqualTo(0);
     }
-
-//     - In the RentBookUseCase I reach out and see if the copy is available
-// - I create a test in the catalog domain that first asserts isAvailable is changed when a copy is rented
-// - I also create a test that returns a CopyDTO which has a CopyId and the isAvailable() field
-// - In the AddBookToCatalogUseCase add the test that checks the cache for the Copy (how to check the cache for the copy?)
-// - Add the CopyDTO to the catalog domain
-// - Add the Copy to cache when saving
-// - Complete the RentBookUseCaseTest
-// - Do the Event
-
 }
