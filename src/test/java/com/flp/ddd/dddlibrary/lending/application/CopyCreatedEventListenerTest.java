@@ -36,9 +36,7 @@ public class CopyCreatedEventListenerTest {
         await().atMost(2, TimeUnit.SECONDS).untilAsserted(() -> {
             CopyDTO lendingCopyDTO = copyDTOCache.getIfPresent(copyId);
             assertThat(lendingCopyDTO).isNotNull();
+            assertThat(lendingCopyDTO.available()).isEqualTo(true);
         });
-        CopyDTO lendingCopyDTO = copyDTOCache.getIfPresent(copyId);
-        assertThat(lendingCopyDTO).isNotNull();
-        assertThat(lendingCopyDTO.available()).isEqualTo(true);
     }
 }

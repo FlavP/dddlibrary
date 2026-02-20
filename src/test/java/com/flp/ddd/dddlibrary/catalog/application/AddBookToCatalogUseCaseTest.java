@@ -92,7 +92,7 @@ public class AddBookToCatalogUseCaseTest {
         long eventCount = applicationEvents.stream(CopyCreatedEvent.class).count();
         CopyCreatedEvent copyCreatedEvent = applicationEvents.stream(CopyCreatedEvent.class)
                         .findFirst()
-                                .orElseThrow();
+                        .orElseThrow();
 
         assertThat(bookEntity.getTitle()).isEqualTo("Clean Code");
         assertThat(bookEntity.getCopies()).hasSize(1);

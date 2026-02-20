@@ -14,6 +14,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RentBookUseCase {
     private final LoanRepository loanRepository;
+    private final CopyRepository copyRepository;
     private final Cache<UUID, CopyDTO> cache;
 
     public void execute(LoanCopyRequest request) {
@@ -24,13 +25,13 @@ public class RentBookUseCase {
                 .createdAt(LocalDateTime.now())
                 .expectedReturnedDate(LocalDate.now().plusWeeks(1))
                 .build();
-        CopyDTO copyDTO = cache.getIfPresent(request.copyId().id());
+        CopyDTO copyDTO = copyRepository.findByCopyId(request.copyId());
 
         if (copyDTO == null || !copyDTO.available()) {
             throw new CopyIsRentedException("The copy is already rented");
         }
 
         loanRepository.save(loan);
-        cache.put(request.copyId().id(), new CopyDTO(new CopyId(request.copyId().id()), false));
+        copyRepository.save(new CopyDTO(new CopyId(request.copyId().id()), false));
     }
 }

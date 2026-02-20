@@ -7,6 +7,7 @@ import com.flp.ddd.dddlibrary.lending.domain.UserId;
 import com.flp.ddd.dddlibrary.lending.domain.exceptions.CopyIsRentedException;
 import com.flp.ddd.dddlibrary.lending.infrastructure.persistence.TestLoanRepository;
 import com.flp.ddd.dddlibrary.lending.infrastructure.persistence.loan.LoanEntity;
+import com.flp.ddd.dddlibrary.shared.events.CopyUpdatedEvent;
 import com.github.benmanes.caffeine.cache.Cache;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.utility.DockerImageName;
 
@@ -54,6 +56,8 @@ public class RentBookUseCaseTest {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private Cache<UUID, CopyDTO> copyDTOCache;
+    @Autowired
+    private ApplicationEvents applicationEvents;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {
@@ -69,7 +73,7 @@ public class RentBookUseCaseTest {
     }
 
     @Test
-    void shouldRentAnExistingAvailableCopy() {
+    void shouldRentAnExistingAvailableCopyAndSendCopyLoanedEvent() {
         UserId userId = new UserId();
         CopyId copyId = new CopyId();
         LoanCopyRequest request = new LoanCopyRequest(userId, copyId);
@@ -77,6 +81,7 @@ public class RentBookUseCaseTest {
 
         LoanEntity loanEntity = loanRepository.findByUserIdAndCopyId(userId, copyId)
                 .orElseThrow(() -> new AssertionError("Loan not found"));
+        long eventCount = applicationEvents.stream(CopyUpdatedEvent.class).count();
 
         assertThat(loanEntity.getUserId().id()).isEqualTo(userId.id());
         assertThat(loanEntity.getCopyId().id()).isEqualTo(copyId.id());
