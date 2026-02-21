@@ -1,7 +1,7 @@
 package com.flp.ddd.dddlibrary.lending.infrastructure.persistence;
 
-import com.flp.ddd.dddlibrary.lending.domain.CopyId;
-import com.flp.ddd.dddlibrary.lending.domain.UserId;
+import com.flp.ddd.dddlibrary.lending.domain.copy.CopyId;
+import com.flp.ddd.dddlibrary.lending.domain.user.UserId;
 import com.flp.ddd.dddlibrary.lending.infrastructure.persistence.loan.LoanEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 

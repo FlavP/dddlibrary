@@ -1,8 +1,8 @@
 package com.flp.ddd.dddlibrary.lending.infrastructure.persistence.loan;
 
-import com.flp.ddd.dddlibrary.lending.domain.CopyId;
-import com.flp.ddd.dddlibrary.lending.domain.LoanId;
-import com.flp.ddd.dddlibrary.lending.domain.UserId;
+import com.flp.ddd.dddlibrary.lending.domain.copy.CopyId;
+import com.flp.ddd.dddlibrary.lending.domain.loan.LoanId;
+import com.flp.ddd.dddlibrary.lending.domain.user.UserId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

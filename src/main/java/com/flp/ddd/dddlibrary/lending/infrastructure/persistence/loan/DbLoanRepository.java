@@ -1,7 +1,7 @@
 package com.flp.ddd.dddlibrary.lending.infrastructure.persistence.loan;
 
-import com.flp.ddd.dddlibrary.lending.domain.Loan;
-import com.flp.ddd.dddlibrary.lending.domain.LoanRepository;
+import com.flp.ddd.dddlibrary.lending.domain.loan.Loan;
+import com.flp.ddd.dddlibrary.lending.domain.loan.LoanRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 

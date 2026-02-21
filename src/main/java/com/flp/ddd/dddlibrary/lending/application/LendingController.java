@@ -1,6 +1,6 @@
 package com.flp.ddd.dddlibrary.lending.application;
 
-import com.flp.ddd.dddlibrary.lending.domain.LoanCopyRequest;
+import com.flp.ddd.dddlibrary.lending.domain.requests.LoanCopyRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

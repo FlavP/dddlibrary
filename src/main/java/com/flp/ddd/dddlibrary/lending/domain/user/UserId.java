@@ -1,4 +1,4 @@
-package com.flp.ddd.dddlibrary.lending.domain;
+package com.flp.ddd.dddlibrary.lending.domain.user;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;

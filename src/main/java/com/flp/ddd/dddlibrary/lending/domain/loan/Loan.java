@@ -1,5 +1,7 @@
-package com.flp.ddd.dddlibrary.lending.domain;
+package com.flp.ddd.dddlibrary.lending.domain.loan;
 
+import com.flp.ddd.dddlibrary.lending.domain.user.UserId;
+import com.flp.ddd.dddlibrary.lending.domain.copy.CopyId;
 import lombok.Builder;
 import lombok.Data;
 

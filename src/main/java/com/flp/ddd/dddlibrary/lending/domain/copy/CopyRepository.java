@@ -1,4 +1,4 @@
-package com.flp.ddd.dddlibrary.lending.domain;
+package com.flp.ddd.dddlibrary.lending.domain.copy;
 
 import org.springframework.stereotype.Repository;
 

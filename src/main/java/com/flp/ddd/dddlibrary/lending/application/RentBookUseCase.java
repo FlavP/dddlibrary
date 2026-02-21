@@ -1,8 +1,14 @@
 package com.flp.ddd.dddlibrary.lending.application;
 
 import com.flp.ddd.dddlibrary.UseCase;
-import com.flp.ddd.dddlibrary.lending.domain.*;
+import com.flp.ddd.dddlibrary.lending.domain.copy.CopyDTO;
+import com.flp.ddd.dddlibrary.lending.domain.copy.CopyId;
+import com.flp.ddd.dddlibrary.lending.domain.copy.CopyRepository;
 import com.flp.ddd.dddlibrary.lending.domain.exceptions.CopyIsRentedException;
+import com.flp.ddd.dddlibrary.lending.domain.loan.Loan;
+import com.flp.ddd.dddlibrary.lending.domain.loan.LoanId;
+import com.flp.ddd.dddlibrary.lending.domain.loan.LoanRepository;
+import com.flp.ddd.dddlibrary.lending.domain.requests.LoanCopyRequest;
 import com.github.benmanes.caffeine.cache.Cache;
 import lombok.RequiredArgsConstructor;
 

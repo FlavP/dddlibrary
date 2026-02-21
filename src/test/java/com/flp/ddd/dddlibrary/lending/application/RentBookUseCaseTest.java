@@ -1,9 +1,9 @@
 package com.flp.ddd.dddlibrary.lending.application;
 
-import com.flp.ddd.dddlibrary.lending.domain.CopyDTO;
-import com.flp.ddd.dddlibrary.lending.domain.CopyId;
-import com.flp.ddd.dddlibrary.lending.domain.LoanCopyRequest;
-import com.flp.ddd.dddlibrary.lending.domain.UserId;
+import com.flp.ddd.dddlibrary.lending.domain.copy.CopyDTO;
+import com.flp.ddd.dddlibrary.lending.domain.copy.CopyId;
+import com.flp.ddd.dddlibrary.lending.domain.requests.LoanCopyRequest;
+import com.flp.ddd.dddlibrary.lending.domain.user.UserId;
 import com.flp.ddd.dddlibrary.lending.domain.exceptions.CopyIsRentedException;
 import com.flp.ddd.dddlibrary.lending.infrastructure.persistence.TestLoanRepository;
 import com.flp.ddd.dddlibrary.lending.infrastructure.persistence.loan.LoanEntity;
@@ -21,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.event.ApplicationEvents;
+import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.utility.DockerImageName;
 
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @ExtendWith(MockitoExtension.class)
 @Transactional
+@RecordApplicationEvents
 public class RentBookUseCaseTest {
     static org.testcontainers.containers.PostgreSQLContainer<?> postgres;
     static {
@@ -82,10 +84,15 @@ public class RentBookUseCaseTest {
         LoanEntity loanEntity = loanRepository.findByUserIdAndCopyId(userId, copyId)
                 .orElseThrow(() -> new AssertionError("Loan not found"));
         long eventCount = applicationEvents.stream(CopyUpdatedEvent.class).count();
+        CopyUpdatedEvent copyUpdatedEvent = applicationEvents.stream(CopyUpdatedEvent.class)
+                        .findFirst()
+                        .orElseThrow();
 
         assertThat(loanEntity.getUserId().id()).isEqualTo(userId.id());
         assertThat(loanEntity.getCopyId().id()).isEqualTo(copyId.id());
         assertThat(loanEntity.getCreatedAt()).isNotNull();
+        assertThat(eventCount).isEqualTo(1);
+        assertThat(copyUpdatedEvent.copyId()).isEqualTo(copyId.id());
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.flp.ddd.dddlibrary.lending.domain;
+package com.flp.ddd.dddlibrary.lending.domain.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

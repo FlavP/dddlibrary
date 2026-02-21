@@ -1,6 +1,6 @@
 package com.flp.ddd.dddlibrary.lending.application;
 
-import com.flp.ddd.dddlibrary.lending.domain.CopyDTO;
+import com.flp.ddd.dddlibrary.lending.domain.copy.CopyDTO;
 import com.flp.ddd.dddlibrary.lending.infrastructure.config.CacheConfig;
 import com.flp.ddd.dddlibrary.shared.events.CopyCreatedEvent;
 import com.github.benmanes.caffeine.cache.Cache;

@@ -1,6 +1,6 @@
 package com.flp.ddd.dddlibrary.lending.infrastructure.persistence.user;
 
-import com.flp.ddd.dddlibrary.lending.domain.UserId;
+import com.flp.ddd.dddlibrary.lending.domain.user.UserId;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

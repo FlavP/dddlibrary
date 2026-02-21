@@ -1,4 +1,4 @@
-package com.flp.ddd.dddlibrary.lending.domain;
+package com.flp.ddd.dddlibrary.lending.domain.loan;
 
 import org.springframework.util.Assert;
 

@@ -1,6 +1,6 @@
 package com.flp.ddd.dddlibrary.lending.infrastructure.config;
 
-import com.flp.ddd.dddlibrary.lending.domain.CopyDTO;
+import com.flp.ddd.dddlibrary.lending.domain.copy.CopyDTO;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
