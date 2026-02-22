@@ -4,7 +4,7 @@ import com.flp.ddd.dddlibrary.UseCase;
 import com.flp.ddd.dddlibrary.catalog.domain.book.*;
 import com.flp.ddd.dddlibrary.catalog.domain.copy.Copy;
 import com.flp.ddd.dddlibrary.catalog.domain.copy.CopyId;
-import com.flp.ddd.dddlibrary.catalog.domain.copy.CopyRepository;
+import com.flp.ddd.dddlibrary.shared.events.CopyCreatedEvent;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.ApplicationEventPublisher;
@@ -17,7 +17,7 @@ import java.util.UUID;
 public class AddBookToCatalogUseCase {
     private final BookSearchService bookSearchService;
     private final BookRepository bookRepository;
-    private final CopyRepository copyRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public Book execute(Isbn isbn) {
         BookInformation result = bookSearchService.search(isbn);
@@ -35,7 +35,11 @@ public class AddBookToCatalogUseCase {
                 .copies(List.of(copy))
                 .build();
         bookRepository.save(book);
-        copyRepository.save(copy);
+        eventPublisher.publishEvent(new CopyCreatedEvent(
+                copy.getId().id(),
+                copy.getBarcode().barcode(),
+                copy.isAvailable()
+        ));
         return book;
     }
 }

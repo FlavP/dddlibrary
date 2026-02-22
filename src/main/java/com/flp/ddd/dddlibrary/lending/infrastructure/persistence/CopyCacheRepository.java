@@ -1,4 +1,4 @@
-package com.flp.ddd.dddlibrary.lending.infrastructure.external;
+package com.flp.ddd.dddlibrary.lending.infrastructure.persistence;
 
 
 import com.flp.ddd.dddlibrary.lending.domain.copy.CopyDTO;

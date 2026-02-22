@@ -5,23 +5,24 @@ import com.flp.ddd.dddlibrary.lending.domain.copy.CopyDTO;
 import com.flp.ddd.dddlibrary.lending.domain.copy.CopyId;
 import com.flp.ddd.dddlibrary.lending.domain.copy.CopyRepository;
 import com.flp.ddd.dddlibrary.lending.domain.exceptions.CopyIsRentedException;
+import com.flp.ddd.dddlibrary.lending.domain.exceptions.CopyNotFoundException;
 import com.flp.ddd.dddlibrary.lending.domain.loan.Loan;
 import com.flp.ddd.dddlibrary.lending.domain.loan.LoanId;
 import com.flp.ddd.dddlibrary.lending.domain.loan.LoanRepository;
 import com.flp.ddd.dddlibrary.lending.domain.requests.LoanCopyRequest;
-import com.github.benmanes.caffeine.cache.Cache;
+import com.flp.ddd.dddlibrary.shared.events.CopyUpdatedEvent;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @UseCase
 @RequiredArgsConstructor
 public class RentBookUseCase {
     private final LoanRepository loanRepository;
     private final CopyRepository copyRepository;
-    private final Cache<UUID, CopyDTO> cache;
+    private final ApplicationEventPublisher eventPublisher;
 
     public void execute(LoanCopyRequest request) {
         Loan loan = Loan.builder()
@@ -33,11 +34,19 @@ public class RentBookUseCase {
                 .build();
         CopyDTO copyDTO = copyRepository.findByCopyId(request.copyId());
 
-        if (copyDTO == null || !copyDTO.available()) {
+        if (copyDTO == null) {
+            throw new CopyNotFoundException("Copy does not exist");
+        }
+
+        if (!copyDTO.available()) {
             throw new CopyIsRentedException("The copy is already rented");
         }
 
         loanRepository.save(loan);
         copyRepository.save(new CopyDTO(new CopyId(request.copyId().id()), false));
+        eventPublisher.publishEvent(new CopyUpdatedEvent(
+                request.copyId().id(),
+                true
+        ));
     }
 }

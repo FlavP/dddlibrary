@@ -78,6 +78,7 @@ public class RentBookUseCaseTest {
     void shouldRentAnExistingAvailableCopyAndSendCopyLoanedEvent() {
         UserId userId = new UserId();
         CopyId copyId = new CopyId();
+        copyDTOCache.put(copyId.id(), new CopyDTO(copyId, true));
         LoanCopyRequest request = new LoanCopyRequest(userId, copyId);
         rentBookUseCase.execute(request);
 
