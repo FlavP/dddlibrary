@@ -14,13 +14,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.event.ApplicationEvents;
 import org.springframework.test.context.event.RecordApplicationEvents;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.utility.DockerImageName;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,21 +31,6 @@ import static org.mockito.Mockito.when;
 @Transactional
 @RecordApplicationEvents
 public class AddBookToCatalogUseCaseTest {
-
-    static org.testcontainers.containers.PostgreSQLContainer<?> postgres;
-
-    static {
-        System.setProperty("testcontainers.ryuk.disabled", "true");
-    }
-
-    static {
-        String home = System.getProperty("user.home");
-        System.setProperty("DOCKER_HOST", "unix://" + home + "/.rd/docker.sock");
-
-        postgres = new org.testcontainers.containers.PostgreSQLContainer<>(DockerImageName.parse("postgres:17.4")).withReuse(true);
-        postgres.start();
-    }
-
     @MockitoBean
     BookSearchService bookSearchService;
     @Autowired
@@ -59,13 +41,6 @@ public class AddBookToCatalogUseCaseTest {
     private JdbcTemplate jdbcTemplate;
     @Autowired
     private ApplicationEvents applicationEvents;
-
-    @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
 
     @BeforeEach
     void cleanDatabase() {
@@ -80,12 +55,6 @@ public class AddBookToCatalogUseCaseTest {
         when(bookSearchService.search(isbn)).thenReturn(bookInformation);
 
         addBookToCatalogUseCase.execute(isbn);
-        // to query for a random record
-//        Integer record = jdbcTemplate.queryForObject(
-//                "SELECT COUNT(*) FROM books WHERE title = ? AND isbn = ?",
-//                Integer.class,
-//                "Clean Code", "9780132350884"
-//        );
 
         BookEntity bookEntity = testBookRepository.findByIsbn(isbn)
                 .orElseThrow(() -> new AssertionError("Book not found"));
